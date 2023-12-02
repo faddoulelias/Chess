@@ -1,4 +1,4 @@
-package chess.Pieces;
+package chess.pieces;
 
 import java.util.ArrayList;
 
@@ -21,6 +21,10 @@ public abstract class Piece {
 
     public boolean hasMoved() {
         return hasMoved;
+    }
+
+    public void setHasMoved(boolean hasMoved) {
+        this.hasMoved = hasMoved;
     }
 
     public boolean isEnemyOrNull(Piece other) {

@@ -1,12 +1,12 @@
 package chess;
 
-import chess.Pieces.Bishop;
-import chess.Pieces.King;
-import chess.Pieces.Knight;
-import chess.Pieces.Pawn;
-import chess.Pieces.Piece;
-import chess.Pieces.Queen;
-import chess.Pieces.Rook;
+import chess.pieces.Bishop;
+import chess.pieces.King;
+import chess.pieces.Knight;
+import chess.pieces.Pawn;
+import chess.pieces.Piece;
+import chess.pieces.Queen;
+import chess.pieces.Rook;
 
 public class Board {
     private Piece[][] board = new Piece[8][8];
@@ -103,6 +103,22 @@ public class Board {
 
     public boolean hasPieceAt(Position position) {
         return board[position.getRank()][position.getFile()] != null;
+    }
+
+    public boolean movePiece(Position from, Position to) {
+        Piece piece = this.getPieceAt(from);
+        if (piece == null) {
+            return false;
+        }
+
+        if (piece.isValidMove(this, from, to)) {
+            this.setPiece(to, piece);
+            this.setPiece(from, null);
+            piece.setHasMoved(true);
+            return true;
+        }
+
+        return false;
     }
 
     public String toString() {

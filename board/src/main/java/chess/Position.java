@@ -33,9 +33,9 @@ public class Position {
      */
     public boolean isDirectlyInFrontOf(Position other, PieceColor color) {
         if (color == PieceColor.WHITE) {
-            return this.file == other.file && this.rank - other.rank == 1;
-        } else {
             return this.file == other.file && this.rank - other.rank == -1;
+        } else {
+            return this.file == other.file && this.rank - other.rank == 1;
         }
     }
 
@@ -50,9 +50,9 @@ public class Position {
      */
     public boolean isInFrontByTwoOf(Position other, PieceColor color) {
         if (color == PieceColor.WHITE) {
-            return this.file == other.file && this.rank - other.rank == 2;
-        } else {
             return this.file == other.file && this.rank - other.rank == -2;
+        } else {
+            return this.file == other.file && this.rank - other.rank == 2;
         }
     }
 
@@ -67,9 +67,9 @@ public class Position {
      */
     public boolean isDiagonallyDirectlyInFrontOf(Position other, PieceColor color) {
         if (color == PieceColor.WHITE) {
-            return Math.abs(this.file - other.file) == 1 && this.rank - other.rank == 1;
-        } else {
             return Math.abs(this.file - other.file) == 1 && this.rank - other.rank == -1;
+        } else {
+            return Math.abs(this.file - other.file) == 1 && this.rank - other.rank == 1;
         }
     }
 
@@ -94,9 +94,9 @@ public class Position {
      */
     public Position getPositionInFront(PieceColor color) {
         if (color == PieceColor.WHITE) {
-            return new Position(this.rank + 1, this.file);
-        } else {
             return new Position(this.rank - 1, this.file);
+        } else {
+            return new Position(this.rank + 1, this.file);
         }
     }
 
@@ -284,6 +284,6 @@ public class Position {
 
     @Override
     public String toString() {
-        return "" + (8 - this.rank) + (char) ('a' + this.file);
+        return (char) ('a' + this.file) + "" + (8 - this.rank);
     }
 }
