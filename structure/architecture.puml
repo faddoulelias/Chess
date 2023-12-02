@@ -1,0 +1,58 @@
+@startuml
+
+title Chess Game - JAVA Class Diagram
+
+
+PieceColor *-- Piece
+PieceType *-- Piece
+Board --* Piece
+Board --* PieceColor
+Piece <|-- King
+Piece <|-- Queen
+Piece <|-- Rook
+Piece <|-- Bishop
+Piece <|-- Knight
+Piece <|-- Pawn
+
+enum PieceColor {
+    WHITE
+    BLACK
+}
+
+enum PieceType {
+    KING
+    QUEEN
+    ROOK
+    BISHOP
+    KNIGHT
+    PAWN
+}
+
+class Board {
+    +Piece[8][8] pieces
+    +PieceColor turn
+    +boolean move(int fromX, int fromY, int toX, int toY)
+    +boolean isCheck(PieceColor color)
+    +boolean isCheckMate(PieceColor color)
+    +boolean isStaleMate(PieceColor color)
+    +boolean isPromotion(int x, int y)
+    +void promote(int x, int y, PieceType type)
+    +Byte[] serialize()
+    +void deserialize(Byte[] data)
+    +String toString()
+}
+
+class Piece {
+    +PieceColor color
+    +PieceType type
+    +boolean isValidMove(Board board, int fromX, int fromY, int toX, int toY)
+    +boolean isValidCapture(Board board, int fromX, int fromY, int toX, int toY)
+    +boolean isValidPromotion(Board board, int fromX, int fromY, int toX, int toY)
+    +boolean isValidEnPassant(Board board, int fromX, int fromY, int toX, int toY)
+    +boolean isValidCastling(Board board, int fromX, int fromY, int toX, int toY)
+    +String toString()
+}
+
+
+@enduml
+
