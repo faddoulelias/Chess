@@ -18,6 +18,18 @@ public class Position {
     }
 
     public Position(String position) {
+        if (position.length() != 2) {
+            throw new IllegalArgumentException("position must be 2 characters long");
+        }
+
+        if (position.charAt(0) < 'a' || position.charAt(0) > 'h') {
+            throw new IllegalArgumentException("first character must be between a and h");
+        }
+
+        if (position.charAt(1) < '1' || position.charAt(1) > '8') {
+            throw new IllegalArgumentException("second character must be between 1 and 8");
+        }
+
         this.file = position.charAt(0) - 'a';
         this.rank = 8 - (position.charAt(1) - '0');
     }

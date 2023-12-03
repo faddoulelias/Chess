@@ -92,7 +92,7 @@
               <manifest>
                 <addClasspath>true</addClasspath>
                 <classpathPrefix>lib/</classpathPrefix>
-                <mainClass>chess.App</mainClass>
+                <mainClass>server.App</mainClass>
               </manifest>
             </archive>
           </configuration>

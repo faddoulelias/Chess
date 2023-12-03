@@ -13,6 +13,10 @@ public class ChessGame {
         return turn;
     }
 
+    public Board getBoard() {
+        return board;
+    }
+
     public boolean play(Position from, Position to) {
         if (board.getPieceAt(from) == null) {
             return false;
