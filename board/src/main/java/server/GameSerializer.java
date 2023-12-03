@@ -1,7 +1,6 @@
 package server;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import chess.Board;
 import chess.ChessGame;
@@ -58,41 +57,45 @@ public class GameSerializer {
 
     protected static String toJSONString(String key, String value) {
         if (value == null) {
-            return "\"" + key + "\":null,";
+            return "\"" + key + "\":null";
         }
-        return "\"" + key + "\": \"" + value + "\",";
+        return "\"" + key + "\": \"" + value;
     }
 
     protected static String toJSONString(String key, Object[] value) {
         if (value == null) {
-            return "\"" + key + "\":null,";
+            return "\"" + key + "\":null";
         }
-        return "\"" + key + "\": " + Arrays.toString(value) + ",";
+        String output = "\"" + key + "\": [";
+        for (int i = 0; i < value.length; i++) {
+            output += "\"" + value[i] + "\"";
+            if (i != value.length - 1) {
+                output += ",";
+            }
+        }
+        output += "]";
+        return output;
     }
 
     protected static String toJSONString(String key, boolean value) {
-        return "\"" + key + "\": " + value + ",";
+        return "\"" + key + "\": " + value;
     }
 
     protected static String toJSONString(String key, ArrayList<?> value) {
         if (value == null) {
             return "\"" + key + "\":null,";
         }
-        return "\"" + key + "\": " + value.toString() + ",";
+        return "\"" + key + "\": " + value.toString();
     }
 
-    // Returns a JSON string representing the game status
-    // {"turn": "white"|"black", "check": "true"|"false", "winner":
-    // "white"|"black"|"none", "draw": "true"|"false", "board": [0, 0, 0, 0, 0, 0,
-    // 0, 0, ...]}
     public static String serializeGame(ChessGame game) {
         String output = "";
         output += "{";
-        output += toJSONString("turn", game.getTurn().toString().toLowerCase());
+        output += toJSONString("turn", game.getTurn().toString().toLowerCase()) + ",";
         output += toJSONString("check",
-                game.getBoard().isCheck(PieceColor.WHITE) || game.getBoard().isCheck(PieceColor.BLACK));
-        output += toJSONString("winner", (String) null);
-        output += toJSONString("draw", (String) null);
+                game.getBoard().isCheck(PieceColor.WHITE) || game.getBoard().isCheck(PieceColor.BLACK)) + ",";
+        output += toJSONString("winner", (String) null) + ",";
+        output += toJSONString("draw", (String) null) + ",";
         output += toJSONString("board", serializeBoard(game.getBoard()));
         output += "}";
         return output;

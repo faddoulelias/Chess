@@ -29,6 +29,7 @@ public class GameHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange t) throws IOException {
+        t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
         switch (t.getRequestMethod()) {
             case "GET":
                 handleGet(t);
