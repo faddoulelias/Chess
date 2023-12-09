@@ -10,6 +10,10 @@ public class Queen extends Piece {
         super(color);
     }
 
+    protected Queen(PieceColor color, boolean hasMoved) {
+        super(color, hasMoved);
+    }
+
     @Override
     public boolean isValidMove(Board board, Position source, Position destination) {
         if (source.equals(destination)) {

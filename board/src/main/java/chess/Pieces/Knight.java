@@ -10,6 +10,10 @@ public class Knight extends Piece {
         super(color);
     }
 
+    protected Knight(PieceColor color, boolean hasMoved) {
+        super(color, hasMoved);
+    }
+
     @Override
     public boolean isValidMove(Board board, Position source, Position destination) {
         return destination.isLShapedFrom(source) && this.isEnemyOrNull(board.getPieceAt(destination));

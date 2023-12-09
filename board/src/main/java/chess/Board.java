@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.ArrayList;
+
 import chess.pieces.Bishop;
 import chess.pieces.King;
 import chess.pieces.Knight;
@@ -13,8 +15,9 @@ public class Board {
 
     public Board() {
         board = new Piece[8][8];
+    }
 
-        // Set all the pieces
+    public void setStartingPosition() {
         this.setPiece(new Position("a1"), new Rook(PieceColor.WHITE));
         this.setPiece(new Position("b1"), new Knight(PieceColor.WHITE));
         this.setPiece(new Position("c1"), new Bishop(PieceColor.WHITE));
@@ -50,7 +53,6 @@ public class Board {
         this.setPiece(new Position("f8"), new Bishop(PieceColor.BLACK));
         this.setPiece(new Position("g8"), new Knight(PieceColor.BLACK));
         this.setPiece(new Position("h8"), new Rook(PieceColor.BLACK));
-
     }
 
     public void setPiece(Position position, Piece piece) {
@@ -105,9 +107,27 @@ public class Board {
         return board[position.getRank()][position.getFile()] != null;
     }
 
+    public boolean willLeaveKingInCheck(Position from, Position to) {
+        Board clone = null;
+        try {
+            clone = (Board) this.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+
+        Piece piece = clone.getPieceAt(from);
+        clone.setPiece(from, null);
+        clone.setPiece(to, piece);
+        return clone.isCheck(piece.getColor());
+    }
+
     public boolean movePiece(Position from, Position to) {
         Piece piece = this.getPieceAt(from);
         if (piece == null) {
+            return false;
+        }
+
+        if (this.willLeaveKingInCheck(from, to)) {
             return false;
         }
 
@@ -139,8 +159,52 @@ public class Board {
         return result;
     }
 
+    public boolean isStalemate(PieceColor color) {
+        if (this.isCheck(color)) {
+            return false;
+        }
+
+        for (int rank = 0; rank < 8; rank++) {
+            for (int file = 0; file < 8; file++) {
+                Piece piece = board[rank][file];
+                if (piece != null && piece.getColor() == color) {
+                    ArrayList<Position> availableMoves = piece.getAllAvailableMoves(this,
+                            new Position(rank, file));
+                    if (availableMoves.size() > 0) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public boolean isCheckmate(PieceColor color) {
+        if (!this.isCheck(color)) {
+            return false;
+        }
+
+        for (int rank = 0; rank < 8; rank++) {
+            for (int file = 0; file < 8; file++) {
+                Piece piece = board[rank][file];
+                if (piece != null && piece.getColor() == color) {
+                    ArrayList<Position> availableMoves = piece.getAllAvailableMoves(this,
+                            new Position(rank, file));
+                    for (Position availableMove : availableMoves) {
+                        if (!this.willLeaveKingInCheck(new Position(rank, file), availableMove)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
     @Override
-    protected Object clone() throws CloneNotSupportedException {
+    public Object clone() throws CloneNotSupportedException {
         Board clone = new Board();
         for (int rank = 0; rank < 8; rank++) {
             for (int file = 0; file < 8; file++) {
@@ -148,5 +212,61 @@ public class Board {
             }
         }
         return clone;
+    }
+
+    public String toJSON() {
+        String result = "[";
+        for (int rank = 0; rank < 8; rank++) {
+            result += "[";
+            for (int file = 0; file < 8; file++) {
+                Piece piece = this.getPieceAt(new Position(rank, file));
+                if (piece == null) {
+                    result += "null";
+                } else {
+                    result += piece.toJSON();
+                }
+                if (file < 7) {
+                    result += ",";
+                }
+            }
+            result += "]";
+            if (rank < 7) {
+                result += ",";
+            }
+        }
+        result += "]";
+        return result;
+    }
+
+    public static String toJSONArray(ArrayList<Board> json) {
+        String result = "[";
+        for (int i = 0; i < json.size(); i++) {
+            result += json.get(i).toJSON();
+            if (i < json.size() - 1) {
+                result += ",";
+            }
+        }
+        result += "]";
+        return result;
+    }
+
+    public static Board fromJSON(String json) {
+        Board result = new Board();
+        json = json.substring(2, json.length() - 2);
+        String[] rows = json.split("\\],\\[");
+        for (int rank = 0; rank < 8; rank++) {
+            String[] pieces = rows[rank].split("(?<=\\}),|(?<=null),");
+
+            for (int file = 0; file < 8; file++) {
+                if (!pieces[file].equals("null")) {
+                    result.setPiece(new Position(rank, file), Piece.fromJSON(pieces[file]));
+                }
+            }
+        }
+        return result;
+    }
+
+    public static ArrayList<Board> fromJSONArray(String json) {
+        return new ArrayList<Board>(); // result;
     }
 }

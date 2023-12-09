@@ -7,7 +7,6 @@ import com.sun.net.httpserver.HttpServer;
 
 public class App {
     public static void main(String[] args) throws IOException {
-        // enable CORS
         System.setProperty("sun.net.httpserver.allowRestrictedHeaders", "true");
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
         server.createContext("/chess", new GameHandler());

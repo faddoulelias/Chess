@@ -5,9 +5,12 @@ import chess.PieceColor;
 import chess.Position;
 
 public class Bishop extends Piece {
-
     public Bishop(PieceColor color) {
         super(color);
+    }
+
+    protected Bishop(PieceColor color, boolean hasMoved) {
+        super(color, hasMoved);
     }
 
     @Override

@@ -10,6 +10,10 @@ public class Pawn extends Piece {
         super(color);
     }
 
+    protected Pawn(PieceColor color, boolean hasMoved) {
+        super(color, hasMoved);
+    }
+
     @Override
     public boolean isValidMove(Board board, Position source, Position destination) {
         if (destination.isDirectlyInFrontOf(source, this.getColor()) && !board.hasPieceAt(destination)) {

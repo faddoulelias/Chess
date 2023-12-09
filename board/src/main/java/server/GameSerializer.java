@@ -59,7 +59,7 @@ public class GameSerializer {
         if (value == null) {
             return "\"" + key + "\":null";
         }
-        return "\"" + key + "\": \"" + value;
+        return "\"" + key + "\": \"" + value + "\"";
     }
 
     protected static String toJSONString(String key, Object[] value) {
@@ -89,13 +89,14 @@ public class GameSerializer {
     }
 
     public static String serializeGame(ChessGame game) {
+        String winner = game.getWinner() == null ? null : game.getWinner().toString().toLowerCase();
+
         String output = "";
         output += "{";
         output += toJSONString("turn", game.getTurn().toString().toLowerCase()) + ",";
-        output += toJSONString("check",
-                game.getBoard().isCheck(PieceColor.WHITE) || game.getBoard().isCheck(PieceColor.BLACK)) + ",";
-        output += toJSONString("winner", (String) null) + ",";
-        output += toJSONString("draw", (String) null) + ",";
+        output += toJSONString("check", game.getBoard().isCheck(game.getTurn())) + ",";
+        output += toJSONString("winner", winner) + ",";
+        output += toJSONString("draw", game.isGameOver() && winner == null) + ",";
         output += toJSONString("board", serializeBoard(game.getBoard()));
         output += "}";
         return output;

@@ -10,6 +10,10 @@ public class King extends Piece {
         super(color);
     }
 
+    protected King(PieceColor color, boolean hasMoved) {
+        super(color, hasMoved);
+    }
+
     @Override
     public boolean isValidMove(Board board, Position source, Position destination) {
         if (!destination.isDirectlyAround(source)) {
