@@ -8,6 +8,7 @@ import chess.ChessGame;
 import chess.Position;
 import chess.pieces.Piece;
 import database.Beans.GameData;
+import database.structure.Game;
 
 public class GameSerializer {
     public static String serializePiece(Piece piece) {
@@ -108,7 +109,9 @@ public class GameSerializer {
         output += toJSONString("winner", winner) + ",";
         output += toJSONString("draw", game.isGameOver() && winner == null) + ",";
         output += toJSONString("board", serializeBoard(game.getBoard())) + ",";
-        output += toJSONString("lastUpdate", gameData.getUpdatedAt().getTime());
+        output += toJSONString("lastUpdate", gameData.getUpdatedAt().getTime()) + ",";
+        output += toJSONString("whitePlayer", Game.whitePlayerUsername(gameData)) + ",";
+        output += toJSONString("blackPlayer", Game.blackPlayerUsername(gameData));
         output += "}";
         return output;
     }

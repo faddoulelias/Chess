@@ -84,10 +84,36 @@ export class Piece {
 export default class Board {
     lastUpdate: number;
     board: BoardArray;
+    whitePlayer: string;
+    blackPlayer: string;
+    turn: PieceColor;
 
-    constructor(board: BoardArray, lastUpdate: number = new Date().getTime()) {
+    constructor(board: BoardArray, lastUpdate: number = new Date().getTime(), whitePlayer: string = "", blackPlayer: string = "", turn: PieceColor = PieceColor.White) {
         this.lastUpdate = lastUpdate;
         this.board = board;
+        this.whitePlayer = whitePlayer;
+        this.blackPlayer = blackPlayer;
+        this.turn = turn;
+    }
+
+    public isUserTurn(): boolean {
+        return this.getUserColor() === this.turn;
+    }
+
+    public getUserColor(): PieceColor | null {
+        let token: string = localStorage.getItem("token") || "";
+        let username: string = atob(token).split(":")[0];
+        console.log(username);
+        if (username === "") {
+            return null;
+        }
+        if (username === this.whitePlayer) {
+            return PieceColor.White;
+        }
+        if (username === this.blackPlayer) {
+            return PieceColor.Black;
+        }
+        return null;
     }
 
     public getPieceAt(x: number, y: number): Piece | null {

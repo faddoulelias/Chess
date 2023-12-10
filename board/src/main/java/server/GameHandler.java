@@ -29,7 +29,6 @@ public class GameHandler implements HttpHandler {
     }
 
     private static void setHttpExchangeResponseHeaders(HttpExchange httpExchange) {
-        // Set common response headers
         httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
         httpExchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
         httpExchange.getResponseHeaders().add("Access-Control-Allow-Headers", "*");

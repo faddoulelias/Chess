@@ -24,6 +24,24 @@ public class Game {
         return null;
     }
 
+    public static String whitePlayerUsername(GameData gameData) {
+        try {
+            return Database.getInstance().getUsername(gameData.getWhitePlayerId());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static String blackPlayerUsername(GameData gameData) {
+        try {
+            return Database.getInstance().getUsername(gameData.getBlackPlayerId());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static boolean play(int gameId, String playerUsername, Position from, Position to) {
         Database db;
         try {

@@ -3,45 +3,51 @@ import API, { MovesArray } from '../api/API';
 import Board, { Piece } from '../api/Board';
 import ChessBoardSquare, { positionToString } from './ChessBoardSquare';
 
-export default function ChessBoard() {
+interface ChessBoardProps {
+    id: number;
+}
+
+export default function ChessBoard(props: ChessBoardProps) {
     const [chessBoard, setChessBoard] = React.useState<any>(new Board([]));
     const [allowableMoves, setAllowableMoves] = React.useState<MovesArray>([]);
     const [selectedSquare, setSelectedSquare] = React.useState<string>("");
 
     async function handleClick(pos: string, piece: Piece | null) {
         if (allowableMoves.includes(pos)) {
-            await API.movePiece(67, selectedSquare, pos);
-            let newChessBoard = await API.getChessBoard(67);
+            await API.movePiece(props.id, selectedSquare, pos);
+            let newChessBoard = await API.getChessBoard(props.id);
             setChessBoard(newChessBoard);
             setAllowableMoves([]);
             setSelectedSquare("");
             return;
         }
 
-        if (piece === null || selectedSquare === pos) {
+        if (piece === null || selectedSquare === pos ||
+            piece.color !== chessBoard.getUserColor()
+        ) {
             setAllowableMoves([]);
             setSelectedSquare("");
             return;
         }
 
 
-        let newAllowableMoves = await API.getAllowableMoves(67, pos);
+        let newAllowableMoves = await API.getAllowableMoves(props.id, pos);
         setAllowableMoves(newAllowableMoves);
         setSelectedSquare(pos);
     }
 
 
     React.useEffect(() => {
-        API.getChessBoard(67).then((data) => {
+        API.getChessBoard(props.id).then((data) => {
             setChessBoard(data);
         });
     }, []);
 
     React.useEffect(() => {
         const interval = setInterval(async () => {
-            let updated = await API.hasUpdated(67, chessBoard.lastUpdate);
+            let updated = await API.hasUpdated(props.id, chessBoard.lastUpdate);
             if (updated) {
-                let newChessBoard = await API.getChessBoard(67);
+                let newChessBoard = await API.getChessBoard(props.id);
                 setChessBoard(newChessBoard);
             }
         }, 1000);
@@ -51,6 +57,9 @@ export default function ChessBoard() {
 
     return (
         <div>
+            <h2> {
+                chessBoard.isUserTurn() ? "Your turn" : "Opponent's turn"
+            } </h2>
             <table
                 style={{
                     borderCollapse: "collapse",
