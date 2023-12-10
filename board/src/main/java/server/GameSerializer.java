@@ -1,12 +1,13 @@
 package server;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import chess.Board;
 import chess.ChessGame;
-import chess.PieceColor;
 import chess.Position;
 import chess.pieces.Piece;
+import database.Beans.GameData;
 
 public class GameSerializer {
     public static String serializePiece(Piece piece) {
@@ -88,7 +89,16 @@ public class GameSerializer {
         return "\"" + key + "\": " + value.toString();
     }
 
-    public static String serializeGame(ChessGame game) {
+    protected static String toJSONString(String key, Integer[] value) {
+        return "\"" + key + "\": " + Arrays.toString(value);
+    }
+
+    protected static String toJSONString(String key, long value) {
+        return "\"" + key + "\": " + value;
+    }
+
+    public static String serializeGame(GameData gameData) {
+        ChessGame game = gameData.getGame();
         String winner = game.getWinner() == null ? null : game.getWinner().toString().toLowerCase();
 
         String output = "";
@@ -97,7 +107,8 @@ public class GameSerializer {
         output += toJSONString("check", game.getBoard().isCheck(game.getTurn())) + ",";
         output += toJSONString("winner", winner) + ",";
         output += toJSONString("draw", game.isGameOver() && winner == null) + ",";
-        output += toJSONString("board", serializeBoard(game.getBoard()));
+        output += toJSONString("board", serializeBoard(game.getBoard())) + ",";
+        output += toJSONString("lastUpdate", gameData.getUpdatedAt().getTime());
         output += "}";
         return output;
     }

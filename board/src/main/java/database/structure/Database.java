@@ -191,7 +191,8 @@ public class Database {
                 rs.getBoolean("isWhiteTurn") ? PieceColor.WHITE : PieceColor.BLACK,
                 rs.getInt("turnCount"));
 
-        return new GameData(game, rs.getInt("playerWhite"), rs.getInt("playerBlack"));
+        return new GameData(game, rs.getInt("playerWhite"), rs.getInt("playerBlack"), rs.getTimestamp("createdAt"),
+                rs.getTimestamp("updatedAt"));
     }
 
     public boolean updateGame(int gameId, ChessGame game) throws SQLException {

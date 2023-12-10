@@ -82,9 +82,11 @@ export class Piece {
 }
 
 export default class Board {
+    lastUpdate: number;
     board: BoardArray;
 
-    constructor(board: BoardArray) {
+    constructor(board: BoardArray, lastUpdate: number = new Date().getTime()) {
+        this.lastUpdate = lastUpdate;
         this.board = board;
     }
 

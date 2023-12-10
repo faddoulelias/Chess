@@ -2,18 +2,19 @@ package server;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Base64;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import chess.ChessGame;
 import chess.Position;
+import database.Beans.GameData;
+import database.structure.Game;
 
 public class GameHandler implements HttpHandler {
-    ChessGame game;
-
-    public GameHandler() {
-        this.game = new ChessGame();
+    private static GameData loadGame(int id) {
+        return Game.load(id);
     }
 
     private boolean sendResponse(HttpExchange t, String response, int code) throws IOException {
@@ -27,15 +28,27 @@ public class GameHandler implements HttpHandler {
         return sendResponse(t, response, 200);
     }
 
+    private static void setHttpExchangeResponseHeaders(HttpExchange httpExchange) {
+        // Set common response headers
+        httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+        httpExchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+        httpExchange.getResponseHeaders().add("Access-Control-Allow-Headers", "*");
+        httpExchange.getResponseHeaders().add("Access-Control-Allow-Credentials", "true");
+        httpExchange.getResponseHeaders().add("Access-Control-Allow-Credentials-Header", "*");
+    }
+
     @Override
     public void handle(HttpExchange t) throws IOException {
-        t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+        setHttpExchangeResponseHeaders(t);
         switch (t.getRequestMethod()) {
             case "GET":
                 handleGet(t);
                 break;
             case "POST":
                 handlePost(t);
+                break;
+            case "OPTIONS":
+                sendResponse(t, "OK");
                 break;
             default:
                 sendResponse(t, "Invalid request method", 405);
@@ -55,6 +68,9 @@ public class GameHandler implements HttpHandler {
                 break;
             case "/chess/moves":
                 getAvailableMoves(t);
+                break;
+            case "/chess/update":
+                getHasUpdate(t);
                 break;
             default:
                 sendResponse(t, "Invalid request path", 404);
@@ -77,17 +93,29 @@ public class GameHandler implements HttpHandler {
     }
 
     public boolean getBoard(HttpExchange t) throws IOException {
+        ChessGame game = loadGame(Integer.parseInt(t.getRequestURI().getQuery())).getGame();
         String response = Arrays.toString(GameSerializer.serializeBoard(game.getBoard()));
         return sendResponse(t, response);
     }
 
     public boolean getStatus(HttpExchange t) throws IOException {
+        GameData game = loadGame(Integer.parseInt(t.getRequestURI().getQuery()));
         return sendResponse(t, GameSerializer.serializeGame(game));
     }
 
+    public boolean getHasUpdate(HttpExchange t) throws IOException {
+        String[] query = t.getRequestURI().getQuery().split("&");
+        int gameId = Integer.parseInt(query[0]);
+        long lastUpdate = Long.parseLong(query[1]);
+        GameData game = loadGame(gameId);
+        return sendResponse(t, (game.getUpdatedAt().getTime() > lastUpdate) ? "true" : "false");
+    }
+
     public boolean getAvailableMoves(HttpExchange t) throws IOException {
+        String[] query = t.getRequestURI().getQuery().split("&");
+        ChessGame game = loadGame(Integer.parseInt(query[0])).getGame();
         try {
-            Position position = new Position(t.getRequestURI().getQuery());
+            Position position = new Position(query[1]);
             String response = GameSerializer.serializeAvailableMoves(game, position);
 
             return sendResponse(t, (response != null) ? response : "[]");
@@ -97,23 +125,27 @@ public class GameHandler implements HttpHandler {
     }
 
     public boolean postMove(HttpExchange t) throws IOException {
-        try {
-            String data = new String(t.getRequestBody().readAllBytes());
-            String[] parts = data.split(",");
-            Position from = new Position(parts[0]);
-            Position to = new Position(parts[1]);
+        String[] data = new String(t.getRequestBody().readAllBytes()).split(",");
+        String authorizationHeader = t.getRequestHeaders().getFirst("Authorization");
+        String[] credentials = new String(Base64.getDecoder().decode(authorizationHeader.substring(6))).split(":");
 
-            System.out.println("From: " + from);
-            System.out.println("To: " + to);
+        String username = credentials[0];
+        String password = credentials[1];
+        int gameId = Integer.parseInt(data[0]);
+        Position from = new Position(data[1]);
+        Position to = new Position(data[2]);
+        boolean success = Game.play(gameId, username, from, to);
 
-            boolean success = game.play(from, to);
-            if (success) {
-                return sendResponse(t, "Move successful");
-            } else {
-                return sendResponse(t, "Move failed", 400);
-            }
-        } catch (Exception e) {
-            return sendResponse(t, "Invalid Request Body", 400);
+        System.out.println("username: " + username);
+        System.out.println("password: " + password);
+        System.out.println("gameId: " + gameId);
+        System.out.println("from: " + from);
+        System.out.println("to: " + to);
+
+        if (success) {
+            return sendResponse(t, "Move played successfully");
+        } else {
+            return sendResponse(t, "Failed to play move", 400);
         }
     }
 

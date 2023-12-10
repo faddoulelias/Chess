@@ -34,6 +34,10 @@ public class Game {
         }
 
         GameData game = load(gameId);
+        if (game == null) {
+            return false;
+        }
+
         int currentPlayerId = game.getTurnPlayerId();
         int thisPlayerId;
         try {
