@@ -1,0 +1,51 @@
+@startuml conceptual-data-model
+
+object player {
+    username: varchar(45)
+}
+
+object game {
+    playerWhite: int
+    playerBlack: int
+    board: json
+    history: json
+    isWhiteTurn: tinyint
+    turnCount: int
+    createdAt: timestamp
+    updatedAt: timestamp
+}
+
+object credentials {
+    email: varchar(320)
+    salt: char(16)
+    sha256: char(64)
+}
+
+object friend_requests {
+    sentAt: timestamp
+}
+
+player "1" -- "1" credentials : **has**
+player "1" -- "0..*" game : **plays**
+player "1" -- "0..*" friend_requests : **sends**
+player "0..*" -- "0..*" player : **is friends with**
+
+@enduml
+
+```
+Ce modele conceptuel de données est une première vision de la forme des données.
+Il servira de base pour la création du modèle relationnel de données. Ainsi que pour le
+diagramme de classes.
+
+Il defini les entités suivantes :
+- player : un joueur
+- game : une partie
+- credentials : les identifiants d'un joueur
+- friend_requests : une demande d'ami
+
+Un joueur peut avoir plusieurs parties, plusieurs identifiants et plusieurs demandes d'amis.
+Une partie peut avoir deux joueurs, un joueur peut avoir plusieurs parties.
+Un joueur peut avoir plusieurs identifiants, un identifiant est lié à un seul joueur.
+Un joueur peut envoyer plusieurs demandes d'amis, une demande d'ami est envoyée par un seul joueur.
+Un joueur peut avoir plusieurs amis, un joueur peut être ami avec plusieurs joueurs (mais pas lui même).
+```

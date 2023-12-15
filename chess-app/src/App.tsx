@@ -38,7 +38,7 @@ function App() {
 
   return (
     <>
-      {loggedIn ? (<GamePage id={67} ></GamePage>) : (AuthenticationPage(authenticationMode))}
+      {loggedIn ? (<GamePage id={73} ></GamePage>) : (AuthenticationPage(authenticationMode))}
     </>
   );
 }

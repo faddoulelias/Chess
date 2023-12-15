@@ -1,7 +1,7 @@
 -- -----------------------------------------------------
 -- Schema chess
 -- -----------------------------------------------------
-CREATE DATABASE IF NOT EXISTS `chess` DEFAULT CHARACTER
+CREATE SCHEMA IF NOT EXISTS `chess` DEFAULT CHARACTER
 SET
   utf8;
 
@@ -27,9 +27,11 @@ CREATE TABLE
     `playerWhite` INT NOT NULL,
     `playerBlack` INT NOT NULL,
     `board` JSON NOT NULL,
-    `history` JSON NULL,
+    `history` JSON NULL DEFAULT NULL,
     `isWhiteTurn` TINYINT NOT NULL,
-    `turnCount` INT NULL,
+    `turnCount` INT NULL DEFAULT NULL,
+    `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
     PRIMARY KEY (`id`),
     INDEX `fk_ChessGame_Player_idx` (`playerWhite` ASC) VISIBLE,
     INDEX `fk_ChessGame_Player1_idx` (`playerBlack` ASC) VISIBLE,
@@ -50,4 +52,33 @@ CREATE TABLE
     PRIMARY KEY (`player_id`),
     UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE,
     CONSTRAINT `fk_credentials_Player1` FOREIGN KEY (`player_id`) REFERENCES `chess`.`player` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  ) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `chess`.`friend_requests`
+-- -----------------------------------------------------
+CREATE TABLE
+  IF NOT EXISTS `chess`.`friend_requests` (
+    `id` INT NULL,
+    `sender` INT NOT NULL,
+    `recipient` INT NOT NULL,
+    `sentAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    INDEX `fk_friend_requests_player1_idx` (`sender` ASC) VISIBLE,
+    INDEX `fk_friend_requests_player2_idx` (`recipient` ASC) VISIBLE,
+    CONSTRAINT `fk_friend_requests_player1` FOREIGN KEY (`sender`) REFERENCES `chess`.`player` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT `fk_friend_requests_player2` FOREIGN KEY (`recipient`) REFERENCES `chess`.`player` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  ) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `chess`.`friends`
+-- -----------------------------------------------------
+CREATE TABLE
+  IF NOT EXISTS `chess`.`friends` (
+    `player1_id` INT NOT NULL,
+    `player2_id` INT NOT NULL,
+    PRIMARY KEY (`player1_id`, `player2_id`),
+    INDEX `fk_player_has_player_player2_idx` (`player2_id` ASC) VISIBLE,
+    INDEX `fk_player_has_player_player1_idx` (`player1_id` ASC) VISIBLE,
+    CONSTRAINT `fk_player_has_player_player1` FOREIGN KEY (`player1_id`) REFERENCES `chess`.`player` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT `fk_player_has_player_player2` FOREIGN KEY (`player2_id`) REFERENCES `chess`.`player` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
   ) ENGINE = InnoDB;

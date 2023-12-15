@@ -1,0 +1,69 @@
+@startuml database-java
+
+package board{
+    package database {
+        package beans{
+        }
+
+        package structure {
+        }
+    }
+}
+
+class board.database.beans.GameData {
+    - game: ChessGame
+    - whitePlayerId: int
+    - blackPlayerId: int
+    - createdAt: Timestamp
+    - updatedAt: Timestamp
+    + getGame(): ChessGame
+    + getWhitePlayerId(): int
+    + getBlackPlayerId(): int
+    + getTurnPlayerId(): int
+    + getCreatedAt(): Timestamp
+    + getUpdatedAt(): Timestamp
+    + GameData(ChessGame, int, int, Timestamp, Timestamp)
+}
+
+class board.database.structure.Database {
+    - connection: Connection
+    - URL: String
+    - USER: String
+    - PASSWORD: String
+    - DATABASE_NAME: String
+    - generateRandomSalt(): String
+    - generateHash(String, String): String
+    - isUsernameTaken(String): boolean
+    - isEmailTaken(String): boolean
+    - getPlayerId(String): int
+    - getUsername(int): String
+    - createUserAndCredentials(String, String, String): boolean
+    - authenticate(String, String): boolean
+    - createGame(String, String): int
+    - loadGame(int): GameData
+    - updateGame(int, ChessGame): boolean
+    + getInstance(): Database
+}
+
+class board.database.structure.Game {
+    + create(String, String): int
+    + load(int): GameData
+    + whitePlayerUsername(GameData): String
+    + blackPlayerUsername(GameData): String
+    + play(int, String, Position, Position): boolean
+}
+
+class board.database.structure.Authentication {
+    - EMAIL_REGEX: String
+    - USERNAME_REGEX: String
+    - PASSWORD_REGEX: String
+    + register(String, String, String): boolean
+    + login(String, String): boolean
+}
+
+board.database.beans.GameData --> board.database.structure.Database : communates to
+board.database.structure.Database <-- board.database.structure.Game : communates to
+board.database.structure.Database <-- board.database.structure.Authentication : communates to
+
+
+@enduml

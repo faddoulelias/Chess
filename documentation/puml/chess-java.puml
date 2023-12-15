@@ -1,0 +1,150 @@
+@startuml chess-java
+package board {
+    package chess {
+        package pieces {
+        }
+    }
+}
+
+enum board.chess.PieceColor {
+    WHITE, BLACK
+}
+
+abstract class board.chess.pieces.Piece {
+    - color: PieceColor
+    - hasMoved: boolean
+    + Piece(color: PieceColor)
+    + Piece(color: PieceColor, hasMoved: boolean)
+    + getColor(): PieceColor
+    + hasMoved(): boolean
+    + setHasMoved(hasMoved: boolean): void
+    + isEnemyOrNull(other: Piece): boolean
+    + getAllAvailableMoves(board: Board, source: Position): ArrayList<Position>
+    + toJSON(): String
+    + fromJSON(json: String): Piece
+    + isValidMove(board: Board, source: Position, destination: Position): boolean
+    + toString(): String
+}
+
+class board.chess.pieces.Pawn {
+    + Pawn(color: PieceColor)
+    + Pawn(color: PieceColor, hasMoved: boolean)
+    + getAllAvailableMoves(board: Board, source: Position): ArrayList<Position>
+    + isValidMove(board: Board, source: Position, destination: Position): boolean
+}
+
+class board.chess.pieces.Rook {
+    + Rook(color: PieceColor)
+    + Rook(color: PieceColor, hasMoved: boolean)
+    + getAllAvailableMoves(board: Board, source: Position): ArrayList<Position>
+    + isValidMove(board: Board, source: Position, destination: Position): boolean
+}
+
+class board.chess.pieces.Knight {
+    + Knight(color: PieceColor)
+    + getAllAvailableMoves(board: Board, source: Position): ArrayList<Position>
+    + isValidMove(board: Board, source: Position, destination: Position): boolean
+}
+
+class board.chess.pieces.Bishop {
+    + Bishop(color: PieceColor)
+    + getAllAvailableMoves(board: Board, source: Position): ArrayList<Position>
+    + isValidMove(board: Board, source: Position, destination: Position): boolean
+}
+
+class board.chess.pieces.Queen {
+    + Queen(color: PieceColor)
+    + getAllAvailableMoves(board: Board, source: Position): ArrayList<Position>
+    + isValidMove(board: Board, source: Position, destination: Position): boolean
+}
+
+class board.chess.pieces.King {
+    + King(color: PieceColor)
+    + King(color: PieceColor, hasMoved: boolean)
+    + getAllAvailableMoves(board: Board, source: Position): ArrayList<Position>
+    + isValidMove(board: Board, source: Position, destination: Position): boolean
+}
+
+class board.chess.Position {
+    - rank: int
+    - file: int
+    + Position(rank: int, file: int)
+    + Position(position: String)
+    + isDirectlyInFrontOf(other: Position, color: PieceColor): boolean
+    + isInFrontByTwoOf(other: Position, color: PieceColor): boolean
+    + isDiagonallyDirectlyInFrontOf(other: Position, color: PieceColor): boolean
+    + isLShapedFrom(other: Position): boolean
+    + getPositionInFront(color: PieceColor): Position
+    + isOnSameDiagonalAs(other: Position): boolean
+    + isDirectlyAround(other: Position): boolean
+    + isOnSameFileAs(other: Position): boolean
+    + isOnSameRankAs(other: Position): boolean
+    + getRankPathTo(destination: Position): Position[]
+    + getFilePathTo(destination: Position): Position[]
+    + getLinearPathTo(destination: Position): Position[]
+    + getDiagonalPathTo(destination: Position): Position[]
+    + getPathTo(destination: Position): Position[]
+    + getRank(): int
+    + getFile(): int
+    + equals(obj: Object): boolean
+    + toString(): String
+}
+
+class board.chess.Board {
+    - board: Piece[][]
+    + Board()
+    + setStartingPosition(): void
+    + setPiece(position: Position, piece: Piece): void
+    + getPieceAt(position: Position): Piece
+    + findKing(color: PieceColor): Position
+    + isCheck(color: PieceColor): boolean
+    + isSafeForKing(position: Position, color: PieceColor): boolean
+    + hasPieceAt(position: Position): boolean
+    + willLeaveKingInCheck(from: Position, to: Position): boolean
+    + movePiece(from: Position, to: Position): boolean
+    + toString(): String
+    + isStalemate(color: PieceColor): boolean
+    + isCheckmate(color: PieceColor): boolean
+    + clone(): Object
+    + toJSON(): String
+    + toJSONArray(json: ArrayList<Board>): String
+    + fromJSON(json: String): Board
+    + fromJSONArray(json: String): ArrayList<Board>
+}
+
+class board.chess.ChessGame {
+    - board: Board
+    - history: ArrayList<Board>
+    - turn: PieceColor
+    - winner: PieceColor
+    - turnCount: int
+    + ChessGame()
+    + create(board: Board, history: ArrayList<Board>, turn: PieceColor, turnCount: int): ChessGame
+    + getTurn(): PieceColor
+    + getHistory(): ArrayList<Board>
+    + getTurnCount(): int
+    + getBoard(): Board
+    + getWinner(): PieceColor
+    + isGameOver(): boolean
+    + checkIfGameIsOver(): boolean
+    + play(from: Position, to: Position): boolean
+    + toString(): String
+}
+
+
+' Relationships
+board.chess.pieces.Piece <|-- board.chess.pieces.Pawn
+board.chess.pieces.Piece <|-- board.chess.pieces.Rook
+board.chess.pieces.Piece <|-- board.chess.pieces.Knight
+board.chess.pieces.Piece <|-- board.chess.pieces.Bishop
+board.chess.pieces.Piece <|-- board.chess.pieces.Queen
+board.chess.pieces.Piece <|-- board.chess.pieces.King
+
+board.chess.PieceColor "1" *-- "1" board.chess.pieces.Piece
+
+board.chess.Board "1" *-- "64" board.chess.pieces.Piece
+
+board.chess.ChessGame "1" *-- "1" board.chess.Board
+board.chess.ChessGame "1" *-- "1" board.chess.PieceColor : turn
+
+@enduml

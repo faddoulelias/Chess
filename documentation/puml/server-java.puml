@@ -1,0 +1,54 @@
+@startuml server-java
+
+package board {
+    package server {
+    }
+}
+
+class board.server.App {
+    + main(args: String[])
+}
+
+class board.server.AuthHandler {
+    + handle(t: HttpExchange)
+    - setHttpExchangeResponseHeaders(t: HttpExchange)
+    - sendResponse(t: HttpExchange, response: String, code: int): boolean
+    - sendResponse(t: HttpExchange, response: String): boolean
+    - handleGet(t: HttpExchange)
+    - handlePost(t: HttpExchange)
+    - getAuth(t: HttpExchange): boolean
+}
+
+class board.server.GameHandler {
+    + handle(t: HttpExchange)
+    - setHttpExchangeResponseHeaders(t: HttpExchange)
+    - sendResponse(t: HttpExchange, response: String, code: int): boolean
+    - sendResponse(t: HttpExchange, response: String): boolean
+    - handleGet(t: HttpExchange)
+    - handlePost(t: HttpExchange)
+    - getBoard(t: HttpExchange): boolean
+    - getStatus(t: HttpExchange): boolean
+    - getHasUpdate(t: HttpExchange): boolean
+    - getAvailableMoves(t: HttpExchange): boolean
+    - postMove(t: HttpExchange): boolean
+    - postPromotion(t: HttpExchange): boolean
+}
+
+class board.server.GameSerializer {
+    + serializePiece(piece: Piece): String
+    + serializeBoard(board: Board): Integer[]
+    + toJSONString(key: String, value: String): String
+    + toJSONString(key: String, value: Object[]): String
+    + toJSONString(key: String, value: boolean): String
+    + toJSONString(key: String, value: ArrayList<?>): String
+    + toJSONString(key: String, value: Integer[]): String
+    + toJSONString(key: String, value: long): String
+    + serializeGame(gameData: GameData): String
+    + serializeAvailableMoves(game: ChessGame, position: Position): String
+}
+
+board.server.App --> board.server.AuthHandler
+board.server.App --> board.server.GameHandler
+board.server.GameHandler --> board.server.GameSerializer
+
+@enduml
